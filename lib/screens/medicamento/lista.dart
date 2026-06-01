@@ -45,10 +45,52 @@ class _ListaMedicamentosState extends State<ListaMedicamentos> {
     _carregar();
   }
 
+  Future<void> _editarMedicamento(Medicamento medicamento) async {
+    final salvo = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => FormularioMedicamento(medicamento: medicamento),
+      ),
+    );
+    if (!mounted) return;
+    if (salvo == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Medicamento atualizado com sucesso!')),
+      );
+    }
+    _carregar();
+  }
+
   Future<void> _deletar(Medicamento medicamento) async {
     if (medicamento.id == null) return;
+
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Excluir medicamento'),
+        content: Text('Deseja excluir "${medicamento.nome}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Excluir',
+                style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmado != true) return;
+
     try {
       await AppSettings.repository.deletar(medicamento.id!);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Medicamento excluído.')),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -143,9 +185,18 @@ class _ListaMedicamentosState extends State<ListaMedicamentos> {
                   ),
                   isThreeLine: medicamento.observacoes != null &&
                       medicamento.observacoes!.isNotEmpty,
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deletar(medicamento),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _editarMedicamento(medicamento),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deletar(medicamento),
+                      ),
+                    ],
                   ),
                   onTap: () => _toggleTomado(medicamento),
                 ),
@@ -157,10 +208,16 @@ class _ListaMedicamentosState extends State<ListaMedicamentos> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
-          await Navigator.of(context).push(
+          final salvo = await Navigator.of(context).push<bool>(
             MaterialPageRoute(
                 builder: (context) => const FormularioMedicamento()),
           );
+          if (!mounted) return;
+          if (salvo == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Medicamento adicionado com sucesso!')),
+            );
+          }
           _carregar();
         },
       ),

@@ -48,7 +48,7 @@ class MedicineApp extends StatelessWidget {
         // Tema para botões elevados (substitui o antigo buttonTheme)
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green.shade700, // Cor de fundo do botão
+            backgroundColor: Colors.blue.shade900, // Cor de fundo do botão
             foregroundColor: Colors.white,          // Cor do texto/ícones no botão
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -57,7 +57,7 @@ class MedicineApp extends StatelessWidget {
 
         // Tema para o FloatingActionButton (FAB)
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.green.shade700, // Cor do botão flutuante
+          backgroundColor: Colors.blue.shade900, // Cor do botão flutuante
           foregroundColor: Colors.white,          // Cor do ícone
         ),
 

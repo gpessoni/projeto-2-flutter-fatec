@@ -18,11 +18,11 @@ class Medicamento {
   // SQLite → objeto
   factory Medicamento.fromMap(Map<String, dynamic> map) {
     final m = Medicamento(
-      map['nome'],
-      map['dosagem'],
-      map['horario'],
-      id: map['id'],
-      observacoes: map['observacoes'],
+      (map['nome'] as String?) ?? '',
+      (map['dosagem'] as String?) ?? '',
+      (map['horario'] as String?) ?? '',
+      id: map['id'] as int?,
+      observacoes: map['observacoes'] as String?,
     );
     m.tomado = map['tomado'] == 1;
     return m;
@@ -40,13 +40,13 @@ class Medicamento {
   // API JSON → objeto
   factory Medicamento.fromJson(Map<String, dynamic> json) {
     final m = Medicamento(
-      json['nome'],
-      json['dosagem'],
-      json['horario'],
-      id: json['id'],
-      observacoes: json['observacoes'],
+      (json['nome'] as String?) ?? '',
+      (json['dosagem'] as String?) ?? '',
+      (json['horario'] as String?) ?? '',
+      id: json['id'] as int?,
+      observacoes: json['observacoes'] as String?,
     );
-    m.tomado = json['tomado'] ?? false;
+    m.tomado = (json['tomado'] as bool?) ?? false;
     return m;
   }
 

@@ -22,10 +22,14 @@ Future<Medicamento> salvarMedicamentoApi(Medicamento medicamento) async {
     body: jsonEncode(medicamento.toJson()),
   );
   if (response.statusCode == 201 || response.statusCode == 200) {
-    return Medicamento.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>);
+    try {
+      return Medicamento.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>);
+    } catch (_) {
+      throw Exception('Resposta inesperada da API: ${response.body}');
+    }
   }
-  throw Exception('Erro ${response.statusCode} ao salvar medicamento.');
+  throw Exception('Erro ${response.statusCode} ao salvar: ${response.body}');
 }
 
 Future<Medicamento> atualizarMedicamentoApi(Medicamento medicamento) async {
@@ -34,11 +38,15 @@ Future<Medicamento> atualizarMedicamentoApi(Medicamento medicamento) async {
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode(medicamento.toJson()),
   );
-  if (response.statusCode == 200) {
-    return Medicamento.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>);
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    try {
+      return Medicamento.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>);
+    } catch (_) {
+      throw Exception('Resposta inesperada da API: ${response.body}');
+    }
   }
-  throw Exception('Erro ${response.statusCode} ao atualizar medicamento.');
+  throw Exception('Erro ${response.statusCode} ao atualizar: ${response.body}');
 }
 
 Future<void> deletarMedicamentoApi(int id) async {
