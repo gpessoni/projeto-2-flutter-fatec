@@ -57,20 +57,18 @@ Future<void> deletarMedicamentoApi(int id) async {
   }
 }
 
-Future<List<Medicamento>> sincronizarMedicamentosApi(
+Future<void> sincronizarMedicamentosApi(
     List<Medicamento> medicamentos) async {
+  if (medicamentos.isEmpty) {
+    return;
+  }
   final response = await http.post(
     Uri.parse('$_baseUrl/medicamentos/sincronizar'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({'medicamentos': medicamentos.map((m) => m.toJson()).toList()}),
   );
   if (response.statusCode == 200 || response.statusCode == 201) {
-    final decoded = jsonDecode(response.body);
-    final List<dynamic> data =
-        decoded is List ? decoded : (decoded as Map<String, dynamic>)['medicamentos'] as List<dynamic>;
-    return data
-        .map((e) => Medicamento.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return;
   }
   throw Exception('Erro ${response.statusCode} ao sincronizar: ${response.body}');
 }

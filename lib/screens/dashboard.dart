@@ -13,11 +13,29 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   bool _sincronizando = false;
+  bool _temDadosLocais = false;
+
+  Future<void> _verificarDadosLocais() async {
+    final locais = await LocalMedicamentoRepository().buscarTodos();
+    if (mounted) {
+      setState(() => _temDadosLocais = locais.isNotEmpty);
+    }
+  }
 
   Future<void> _sincronizar() async {
     setState(() => _sincronizando = true);
     try {
       final locais = await LocalMedicamentoRepository().buscarTodos();
+      if (locais.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Não há medicamentos locais para sincronizar.'),
+            ),
+          );
+        }
+        return;
+      }
       await sincronizarMedicamentosApi(locais);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -33,6 +51,12 @@ class _DashboardState extends State<Dashboard> {
     } finally {
       if (mounted) setState(() => _sincronizando = false);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _verificarDadosLocais();
   }
 
   @override
@@ -82,12 +106,13 @@ class _DashboardState extends State<Dashboard> {
                   _FeatureItem(
                     nome: 'Medicamentos',
                     icone: Icons.medication,
-                    onClick: () {
-                      Navigator.of(context).push(
+                    onClick: () async {
+                      await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const ListaMedicamentos(),
                         ),
                       );
+                      await _verificarDadosLocais();
                     },
                   ),
                 ],
@@ -118,8 +143,9 @@ class _DashboardState extends State<Dashboard> {
                       leading:
                           Icon(Icons.sync, color: Colors.blue.shade900),
                       title: const Text('Sincronizar local → API'),
-                      subtitle:
-                          const Text('Envia dados locais para a nuvem'),
+                      subtitle: Text(_temDadosLocais
+                        ? 'Envia dados locais para a nuvem'
+                        : 'Não há dados locais para sincronizar'),
                       trailing: _sincronizando
                           ? const SizedBox(
                               width: 20,
@@ -129,7 +155,9 @@ class _DashboardState extends State<Dashboard> {
                             )
                           : Icon(Icons.arrow_forward_ios,
                               size: 16, color: Colors.grey.shade600),
-                      onTap: _sincronizando ? null : _sincronizar,
+                      onTap: _sincronizando || !_temDadosLocais
+                          ? null
+                          : _sincronizar,
                     ),
                   ],
                 ),
