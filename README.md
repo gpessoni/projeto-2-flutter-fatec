@@ -1,115 +1,259 @@
-# MedControl — Controle de Medicamentos
+MedControl --- Controle de Medicamentos
+=====================================
 
-## Identificação do projeto
+Aplicativo mobile desenvolvido em Flutter para gerenciamento e acompanhamento do uso de medicamentos.
 
-```
-Nome da temática do aplicativo: Controle de medicamentos
-Integrante 1: Gabriel da Silveira Pessoni
-Integrante 2: Lívia Portela Ferreira
-```
+O sistema permite cadastrar, visualizar, atualizar e excluir medicamentos, além de oferecer suporte para armazenamento local utilizando SQLite ou armazenamento remoto por meio de uma API REST integrada a um banco PostgreSQL.
 
----
+* * * * *
 
-## Linguagem e Framework
+Integrantes
+-----------
 
-- **Linguagem:** Dart
-- **Framework:** Flutter
+-   Gabriel da Silveira Pessoni
 
----
+-   Lívia Portela Ferreira
 
-## Sobre o projeto
+-   Maria Clara Cardoso Costa
 
-Aplicativo mobile para controle de medicamentos tomados.
-Permite cadastrar remédios com nome, dosagem, horário e observações, marcar como tomado e excluir registros.
+* * * * *
 
-Os dados podem ser persistidos **localmente (SQLite)** ou na **nuvem (API + PostgreSQL)**, com troca de fonte via switch na tela principal e botão de sincronização local → API.
+Tecnologias Utilizadas
+----------------------
 
----
+### Front-end
 
-## Estrutura do projeto
+-   Flutter
+
+-   Dart
+
+### Persistência Local
+
+-   SQLite
+
+### Persistência Remota
+
+-   API REST
+
+-   PostgreSQL
+
+* * * * *
+
+Funcionalidades
+---------------
+
+### Gerenciamento de Medicamentos
+
+-   Cadastro de medicamentos
+
+-   Listagem de medicamentos
+
+-   Marcação de medicamento como tomado ou não tomado
+
+-   Exclusão de medicamentos
+
+-   Exibição de identificador sequencial
+
+### Persistência de Dados
+
+-   Armazenamento local utilizando SQLite
+
+-   Armazenamento remoto utilizando API REST
+
+-   Alternância entre persistência local e remota
+
+### Sincronização
+
+-   Envio de registros locais para a API
+
+-   Sincronização de medicamentos cadastrados offline
+
+* * * * *
+
+Estrutura do Projeto
+--------------------
 
 ```
 lib/
-├── components/       # Componentes reutilizáveis (Editor)
-├── data/             # Configurações globais (AppSettings, switch local/API)
-├── db/               # Persistência local com SQLite
-├── models/           # Modelo de dados (Medicamento)
-├── repository/       # Camada repository (abstração + implementações local e API)
-├── screens/          # Telas do aplicativo (Dashboard, Lista, Formulário)
-└── services/         # Camada de serviço para comunicação com a API
+├── components/
+│   └── Componentes reutilizáveis da interface
+│
+├── data/
+│   └── Configurações globais da aplicação
+│
+├── db/
+│   └── Persistência local utilizando SQLite
+│
+├── models/
+│   └── Modelos de dados
+│
+├── repository/
+│   ├── Interface de acesso aos dados
+│   ├── Implementação SQLite
+│   └── Implementação API
+│
+├── screens/
+│   └── Telas da aplicação
+│
+└── services/
+    └── Comunicação com a API REST
+
 ```
 
----
+* * * * *
 
-## Funcionalidades
+Modelo de Dados
+---------------
 
-- Cadastrar medicamento (nome, dosagem, horário, observações)
-- Listar medicamentos com ID sequencial
-- Marcar medicamento como tomado / não tomado
-- Excluir medicamento
-- Alternar entre persistência local (SQLite) e remota (API)
-- Sincronizar dados locais com a API
+Cada medicamento possui os seguintes atributos:
 
----
+| Campo | Tipo |
+| --- | --- |
+| id | int |
+| nome | String |
+| dosagem | String |
+| horario | String |
+| tomado | bool |
+| observacoes | String |
 
-## API — Rotas disponíveis
+### Exemplo
 
-**URL base:** `https://projeto-flutter-fatec-api.onrender.com`
+```
+{
+  "id": 1,
+  "nome": "Dipirona",
+  "dosagem": "500mg",
+  "horario": "08:00",
+  "tomado": false,
+  "observacoes": "Tomar com água"
+}
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/medicamentos` | Lista todos os medicamentos |
-| GET | `/medicamentos/:id` | Busca um medicamento por ID |
-| POST | `/medicamentos` | Cadastra um novo medicamento |
-| POST | `/medicamentos/sincronizar` | Sincroniza múltiplos medicamentos |
-| PUT | `/medicamentos/:id` | Atualiza um medicamento |
-| DELETE | `/medicamentos/:id` | Remove um medicamento |
+```
 
-### Campos do registro
+* * * * *
+
+API REST
+--------
+
+### URL Base
+
+```
+https://projeto-flutter-fatec-api.onrender.com
+
+```
+
+### Endpoints Disponíveis
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| GET | /medicamentos | Lista todos os medicamentos |
+| GET | /medicamentos/:id | Busca um medicamento por ID |
+| POST | /medicamentos | Cadastra um novo medicamento |
+| POST | /medicamentos/sincronizar | Sincroniza múltiplos medicamentos |
+| PUT | /medicamentos/:id | Atualiza um medicamento |
+| DELETE | /medicamentos/:id | Remove um medicamento |
+
+* * * * *
+
+Campos do Registro
+------------------
 
 | Campo | Tipo | Obrigatório | Descrição |
-|-------|------|-------------|-----------|
-| `nome` | string | Sim | Nome do medicamento (2–100 chars) |
-| `dosagem` | string | Sim | Ex: "500mg", "1 comprimido" |
-| `horario` | string | Sim | Ex: "08:00", "após almoço" |
-| `tomado` | boolean | Não | Se foi tomado (padrão: false) |
-| `observacoes` | string | Não | Anotações livres (até 1000 chars) |
+| --- | --- | --- | --- |
+| nome | string | Sim | Nome do medicamento |
+| dosagem | string | Sim | Exemplo: 500mg ou 1 comprimido |
+| horario | string | Sim | Exemplo: 08:00 ou após almoço |
+| tomado | boolean | Não | Indica se o medicamento foi tomado |
+| observacoes | string | Não | Observações adicionais |
 
-### Exemplos de uso
+* * * * *
 
-**POST /medicamentos**
-```json
+Exemplo de Cadastro
+-------------------
+
+### POST /medicamentos
+
+```
 {
   "nome": "Dipirona",
   "dosagem": "500mg",
   "horario": "08:00",
   "observacoes": "Tomar com água"
 }
+
 ```
 
-**PUT /medicamentos/1**
-```json
+* * * * *
+
+Exemplo de Atualização
+----------------------
+
+### PUT /medicamentos/1
+
+```
 {
   "nome": "Dipirona",
   "dosagem": "500mg",
   "horario": "08:00",
   "tomado": true
 }
+
 ```
 
-**DELETE /medicamentos/1**
+* * * * *
+
+Exemplo de Exclusão
+-------------------
+
+### DELETE /medicamentos/1
+
+Não é necessário enviar body na requisição.
+
+* * * * *
+
+Como Executar o Projeto
+-----------------------
+
+### Clonar o repositório
+
 ```
-Sem body. Retorna 200 em caso de sucesso.
+git clone <url-do-repositorio>
+
 ```
 
----
+### Acessar a pasta do projeto
 
-## Como executar
+```
+cd medcontrol
 
-```bash
-# Instalar dependências
+```
+
+### Instalar as dependências
+
+```
 flutter pub get
 
-# Executar o app
-flutter run
 ```
+
+### Executar a aplicação
+
+```
+flutter run
+
+```
+
+* * * * *
+
+Fluxo de Utilização
+-------------------
+
+1.  Escolha a fonte de dados (SQLite ou API).
+
+2.  Cadastre os medicamentos desejados.
+
+3.  Marque os medicamentos conforme forem tomados.
+
+4.  Utilize a sincronização para enviar registros locais à API.
+
+5.  Gerencie os medicamentos por meio da aplicação.
+
