@@ -52,6 +52,7 @@ class Medicamento {
 
   // objeto → API JSON
   Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
         'nome': nome,
         'dosagem': dosagem,
         'horario': horario,
